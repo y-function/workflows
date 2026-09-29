@@ -29,8 +29,12 @@ jobs:
       uses: danielpalme/ReportGenerator-GitHub-Action@5.5.11
       with:
         reports: ./**/Coverage/coverage.cobertura.xml
-        reportTypes: HtmlInline;Cobertura;HtmlChart
+        reportTypes: HtmlInline;Cobertura;MarkdownSummaryGithub
+        targetdir: ./Coverage/
         customSettings: 'minimumCoverageThresholds:lineCoverage=90'
+    - name: Publish coverage in build summary
+      run: cat ./Coverage/SummaryGithub.md >> $GITHUB_STEP_SUMMARY # Adjust path and filename if necessary
+      shell: bash
     - name: Pack
       if: github.event_name == 'release'
       run: dotnet pack /p:Version=$VERSION --configuration Release --output ./nupkg
