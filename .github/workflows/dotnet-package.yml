@@ -24,7 +24,7 @@ jobs:
     - name: Build
       run: dotnet build --no-restore
     - name: Test
-      run: dotnet test /p:CollectCoverage=true /p:CoverletOutput=./TestResults /p:CoverletOutputFormat=cobertura --no-build --verbosity normal
+      run: dotnet test /p:CollectCoverage=true /p:CoverletOutput=./TestResults/ /p:CoverletOutputFormat=cobertura --no-build --verbosity normal
     - name: Report Coverage
       uses: danielpalme/ReportGenerator-GitHub-Action@5.5.11
       with:
