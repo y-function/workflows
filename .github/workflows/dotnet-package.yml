@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6.1.0
     - name: Setup .NET
       uses: actions/setup-dotnet@v6.0.0
       with:
@@ -24,7 +24,11 @@ jobs:
     - name: Build
       run: dotnet build --no-restore
     - name: Test
-      run: dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura --no-build --verbosity normal
+      run: dotnet test /p:CollectCoverage=true /p:CoverletOutput=./TestResults /p:CoverletOutputFormat=cobertura --no-build --verbosity normal
+    - name: Report Coverage
+      uses: danielpalme/ReportGenerator-GitHub-Action@5.5.11
+      with:
+        reports: coverage.cobertura.xml
     - name: Pack
       if: github.event_name == 'release'
       run: dotnet pack /p:Version=$VERSION --configuration Release --output ./nupkg
