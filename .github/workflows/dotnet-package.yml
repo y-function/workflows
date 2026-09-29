@@ -2,14 +2,6 @@ name: Publish Dotnet Package
 
 on:
   workflow_call:
-    inputs:
-      ref_name:
-        required: true
-        type: string
-
-env:
-    sln_path: "./${{ vars.SLN_NAME }}"
-    ref_name: ${{ github.ref_name }}
 
 jobs:
   build:
@@ -28,14 +20,14 @@ jobs:
         echo "Version: " $ref_name
         echo "VERSION=$(echo "$ref_name" | cut -c 2-)" >> $GITHUB_ENV
     - name: Restore dependencies
-      run: dotnet restore $sln_path
+      run: dotnet restore
     - name: Build
-      run: dotnet build $sln_path --no-restore
+      run: dotnet build --no-restore
     - name: Test
-      run: dotnet test $sln_path --no-build --verbosity normal
+      run: dotnet test --no-build --verbosity normal
     - name: Pack
       if: github.event_name == 'release'
-      run: dotnet pack /p:Version=$VERSION $sln_path --configuration Release --output ./nupkg
+      run: dotnet pack /p:Version=$VERSION --configuration Release --output ./nupkg
     - name: Publish
       if: github.event_name == 'release'
       run: dotnet nuget push ./nupkg/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" --skip-duplicate
