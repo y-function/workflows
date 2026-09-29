@@ -17,8 +17,8 @@ jobs:
     - name: Define VERSION
       if: github.event_name == 'release'
       run: |
-        echo "Version: " $ref_name
-        echo "VERSION=$(echo "$ref_name" | cut -c 2-)" >> $GITHUB_ENV
+        echo "Version: " ${{ github.ref_name }}
+        echo "VERSION=$(echo "${{ github.ref_name }}" | cut -c 2-)" >> $GITHUB_ENV
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
