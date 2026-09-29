@@ -24,11 +24,13 @@ jobs:
     - name: Build
       run: dotnet build --no-restore
     - name: Test
-      run: dotnet test /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:MergeWith=../../TestResults/totalcoverage.cobertura.xml /p:CoverletOutputFormat=cobertura --no-build --verbosity normal
+      run: dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=./Coverage/ --no-build --verbosity normal
     - name: Report Coverage
       uses: danielpalme/ReportGenerator-GitHub-Action@5.5.11
       with:
-        reports: ./TestResults/totalcoverage.cobertura.xml
+        reports: **/Coverage/coverage.cobertura.xml
+        reportTypes: HtmlInline;Cobertura;HtmlChart
+        customSettings: 'minimumCoverageThresholds:lineCoverage=90'
     - name: Pack
       if: github.event_name == 'release'
       run: dotnet pack /p:Version=$VERSION --configuration Release --output ./nupkg
