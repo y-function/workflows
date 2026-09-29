@@ -28,7 +28,7 @@ jobs:
     - name: Report Coverage
       uses: danielpalme/ReportGenerator-GitHub-Action@5.5.11
       with:
-        reports: **/Coverage/coverage.cobertura.xml
+        reports: ./**/Coverage/coverage.cobertura.xml
         reportTypes: HtmlInline;Cobertura;HtmlChart
         customSettings: 'minimumCoverageThresholds:lineCoverage=90'
     - name: Pack
