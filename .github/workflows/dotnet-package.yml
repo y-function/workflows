@@ -25,14 +25,19 @@ jobs:
       run: dotnet build --no-restore
     - name: Test
       run: dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=./Coverage/ --no-build --verbosity normal
-    - name: Report Coverage
+    - name: Report coverage
       uses: danielpalme/ReportGenerator-GitHub-Action@5.5.11
       with:
         reports: ./**/Coverage/coverage.cobertura.xml
         reportTypes: HtmlInline;Cobertura;MarkdownSummaryGithub
         targetdir: ./Coverage/
         customSettings: 'minimumCoverageThresholds:lineCoverage=90'
-    - name: Publish coverage in build summary
+    - name: Upload test coverage artifacts
+      uses: actions/upload-artifact@v7.0.1
+      with:
+        name: test coverage
+        path: ./Coverage/
+    - name: Publish test coverage in build summary
       run: cat ./Coverage/SummaryGithub.md >> $GITHUB_STEP_SUMMARY # Adjust path and filename if necessary
       shell: bash
     - name: Pack
