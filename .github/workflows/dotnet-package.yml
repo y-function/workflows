@@ -28,7 +28,7 @@ jobs:
     - name: Report Coverage
       uses: danielpalme/ReportGenerator-GitHub-Action@5.5.11
       with:
-        reports: /TestResults/totalcoverage.cobertura.xml
+        reports: ./TestResults/totalcoverage.cobertura.xml
     - name: Pack
       if: github.event_name == 'release'
       run: dotnet pack /p:Version=$VERSION --configuration Release --output ./nupkg
