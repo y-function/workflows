@@ -24,7 +24,7 @@ jobs:
     - name: Build
       run: dotnet build --no-restore
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura --no-build --verbosity normal
     - name: Pack
       if: github.event_name == 'release'
       run: dotnet pack /p:Version=$VERSION --configuration Release --output ./nupkg
