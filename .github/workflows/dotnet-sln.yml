@@ -12,12 +12,6 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    permissions:
-      contents: read
-      packages: write
-      attestations: write
-      id-token: write
-
     steps:
     - uses: actions/checkout@v4
     - name: Setup .NET
@@ -33,7 +27,9 @@ jobs:
     - name: Test
       run: dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=./Coverage/ --no-build --verbosity normal
     - name: Report coverage
+      id: coverage
       uses: danielpalme/ReportGenerator-GitHub-Action@5.5.11
+      if: ${{ hashFiles('./**/Coverage/coverage.*.cobertura.xml') != '' }}
       with:
         reports: ./**/Coverage/coverage.*.cobertura.xml
         reportTypes: HtmlInline;Cobertura;MarkdownSummaryGithub
@@ -41,9 +37,11 @@ jobs:
         customSettings: 'minimumCoverageThresholds:lineCoverage=90'
     - name: Upload test coverage artifacts
       uses: actions/upload-artifact@v7.0.1
+      if: ${{ steps.coverage.conclusion != 'skipped' }}
       with:
         name: test coverage
         path: ./Coverage/
     - name: Publish test coverage in build summary
+      if: ${{ steps.coverage.conclusion != 'skipped' }}
       run: cat ./Coverage/SummaryGithub.md >> $GITHUB_STEP_SUMMARY # Adjust path and filename if necessary
       shell: bash
