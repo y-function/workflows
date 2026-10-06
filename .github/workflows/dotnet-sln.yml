@@ -1,0 +1,47 @@
+name: Build Dotnet Solution
+
+on:
+  workflow_call:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+    - name: Register package source
+      run: dotnet nuget update source github-y-function --username ${{ github.actor }} --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --no-restore
+    - name: Test
+      run: dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=./Coverage/ --no-build --verbosity normal
+    - name: Report coverage
+      id: coverage
+      uses: danielpalme/ReportGenerator-GitHub-Action@5.5.11
+      if: ${{ hashFiles('./**/Coverage/coverage.*.cobertura.xml') != '' }}
+      with:
+        reports: ./**/Coverage/coverage.*.cobertura.xml
+        reportTypes: HtmlInline;Cobertura;MarkdownSummaryGithub
+        targetdir: ./Coverage/
+        customSettings: 'minimumCoverageThresholds:lineCoverage=90'
+    - name: Upload test coverage artifacts
+      uses: actions/upload-artifact@v7.0.1
+      if: ${{ steps.coverage.conclusion != 'skipped' }}
+      with:
+        name: test coverage
+        path: ./Coverage/
+    - name: Publish test coverage in build summary
+      if: ${{ steps.coverage.conclusion != 'skipped' }}
+      run: cat ./Coverage/SummaryGithub.md >> $GITHUB_STEP_SUMMARY # Adjust path and filename if necessary
+      shell: bash
